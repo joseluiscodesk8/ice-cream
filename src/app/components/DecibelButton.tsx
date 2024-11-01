@@ -1,30 +1,26 @@
 import React, { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import Image from "next/image";
 
 const DecibelButton: React.FC = () => {
-  const [decibels, setDecibels] = useState<number | null>(null);
+  const [decibels, setDecibels] = useState<number>(0);
   const [isListening, setIsListening] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const microphoneRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const dataArrayRef = useRef<Uint8Array | null>(null);
 
+  const maxDecibels = 100; // Nivel objetivo de decibeles para detener la animación
+
   const startListening = async () => {
     try {
-      console.log("Solicitando acceso al micrófono...");
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      console.log("Acceso al micrófono concedido.");
-
-      // Crear el contexto de audio y el nodo de análisis
       audioContextRef.current = new AudioContext();
       analyserRef.current = audioContextRef.current.createAnalyser();
       analyserRef.current.fftSize = 256;
       dataArrayRef.current = new Uint8Array(analyserRef.current.frequencyBinCount);
-
-      // Conectar el micrófono al contexto de audio
       microphoneRef.current = audioContextRef.current.createMediaStreamSource(stream);
       microphoneRef.current.connect(analyserRef.current);
-
-      console.log("Comenzando a captar decibeles...");
       setIsListening(true);
     } catch (error) {
       console.error("Error al acceder al micrófono:", error);
@@ -32,13 +28,10 @@ const DecibelButton: React.FC = () => {
   };
 
   const stopListening = () => {
-    console.log("Deteniendo la captura de audio...");
     if (microphoneRef.current) microphoneRef.current.disconnect();
     if (analyserRef.current) analyserRef.current.disconnect();
     if (audioContextRef.current) audioContextRef.current.close();
-
     setIsListening(false);
-    console.log("Captura de audio detenida.");
   };
 
   useEffect(() => {
@@ -46,31 +39,54 @@ const DecibelButton: React.FC = () => {
       const captureDecibels = () => {
         if (analyserRef.current && dataArrayRef.current) {
           analyserRef.current.getByteFrequencyData(dataArrayRef.current);
-
-          // Calcular el nivel promedio de decibeles
           const sum = dataArrayRef.current.reduce((a, b) => a + b, 0);
           const average = sum / dataArrayRef.current.length;
-          const decibels = Math.round(average);
-
+          const decibels = Math.min(Math.round(average), maxDecibels);
           setDecibels(decibels);
-          console.log(`Decibeles actuales: ${decibels} dB`);
-        }
 
-        // Continuar la captura en cada frame
+          if (decibels >= maxDecibels) stopListening();
+        }
         if (isListening) requestAnimationFrame(captureDecibels);
       };
-
-      // Iniciar la captura
       requestAnimationFrame(captureDecibels);
     }
-  }, [isListening]); // Solo se ejecuta cuando `isListening` cambia
+  }, [isListening]);
 
   return (
-    <div>
+    <div style={{ textAlign: "center" }}>
       <button onClick={isListening ? stopListening : startListening}>
         {isListening ? "Detener" : "Capturar Decibeles"}
       </button>
-      {decibels !== null && <p>Nivel de decibeles: {decibels} dB</p>}
+
+      <div
+        style={{
+          position: "relative",
+          width: "150px",
+          height: "300px",
+          border: "2px solid #ddd",
+          margin: "20px auto",
+          borderRadius: "10px",
+          overflow: "hidden",
+        }}
+      >
+        <motion.div
+          initial={{ height: 0 }}
+          animate={{ height: `${(decibels / maxDecibels) * 100}%` }}
+          transition={{ ease: "easeOut", duration: 0.5 }}
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            width: "100%",
+            backgroundColor: decibels >= maxDecibels ? "red" : "green",
+          }}
+        />
+        
+        {/* Imagen en el centro */}
+        <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
+          <Image src="/bart.png" alt="Icono" width={150} height={150} />
+        </div>
+      </div>
     </div>
   );
 };
