@@ -1,11 +1,49 @@
 .decibels {
-    position: absolute;
-    width: 100%;
+  width: 100%;
+
+  & section {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+
+    & div {
+
+      .insideCurve {
+        position: absolute;
+        top: -20px; // Adjust as needed
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        height: 40px;
+        background-color: #fff;
+        border-radius: 50%;
+        box-shadow: inset  0 -5px 5px #ccc;
+      }
+    }
+
+    & picture {
+        // display: flex;
+        // width: 100%;
+        // height: 100%;
+        // background-image: url('/ice-base.png');
+        // background-repeat: no-repeat;
+        // background-size: 500px 550px;
+        // transform: translate(0, 80px);
+
+        & img {
+            transform: translate(0, 80px);
+        }
+    }
+    
+  }
 }
 
 .ice {
-    position: absolute;
-    width: 98%;
-    border-radius: 15px;
-    box-shadow: 0 5px 5px #969696;
+  position: absolute;
+  width: 98%;
+  border-radius: 15px;
+  box-shadow: 0 5px 5px #969696;
 }

@@ -55,34 +55,3 @@ export default function Home() {
     </div>
   );
 }
-
-
-
-// 'use client'
-
-// import dynamic from "next/dynamic";
-// import { useState } from "react";
-
-// // Dynamically import the components
-// const DynamicAudio = dynamic(() => import('../components/DecibelButton'));
-// const Gift = dynamic(() => import('../components/Gift'));
-
-// export default function Home() {
-//   const [showGift, setShowGift] = useState(false); // State to toggle between DecibelButton and Gift components
-
-//   const handleGiftReturn = () => {
-//     setShowGift(false); // Hide the gift and show the DecibelButton
-//   };
-
-//   return (
-//     <div>
-//       {showGift ? (
-//         // Show Gift component when the decibel limit is exceeded
-//         <Gift onReturn={handleGiftReturn} />
-//       ) : (
-//         // Show DecibelButton component
-//         <DynamicAudio onLimitReached={() => setShowGift(true)} />
-//       )}
-//     </div>
-//   );
-// }
