@@ -158,7 +158,7 @@ const DecibelButton: React.FC<{ onLimitReached: () => void }> = ({
             zIndex: "-400", // Este div tiene un zIndex mayor al de la imagen adicional
             width: "100%",
             height: "100%",
-            backgroundColor: "rgba(255, 255, 255, 0.5)", // Semitransparente para cubrir la imagen adicional
+            backgroundColor: "rgba(255, 255, 255, 1)", // Semitransparente para cubrir la imagen adicional
           }}
         ></motion.div>
 
