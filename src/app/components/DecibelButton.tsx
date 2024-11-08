@@ -13,7 +13,7 @@ const DecibelButton: React.FC<{ onLimitReached: () => void }> = ({
   const microphoneRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const dataArrayRef = useRef<Uint8Array | null>(null);
 
-  const maxDecibels = 60; // Nivel objetivo de decibeles para detener la animación
+  const maxDecibels = 70; // Nivel objetivo de decibeles para detener la animación
 
   const startListening = async () => {
     try {
