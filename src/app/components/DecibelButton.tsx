@@ -130,10 +130,10 @@ const DecibelButton: React.FC = () => {
 
         {/* Imagen adicional que aparece detrás */}
         <motion.div
-          initial={{ y: "20px" }}
+          initial={{ y: "80px" }}
           animate={{
             opacity: 1,
-            y: "20px",
+            y: "80px",
           }}
           transition={{ ease: "easeOut", duration: 0.5 }}
           style={{
