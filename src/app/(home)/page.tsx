@@ -1,17 +1,38 @@
 "use client";
 
-import dynamic from "next/dynamic";
 
+import React, { useState } from "react";
+import DecibelButton from "../components/DecibelButton";
+import Gift from "../components/Gift";
 
-// Dynamically import the components
-const DynamicAudio = dynamic(() => import("../components/DecibelButton"));
-// const Gift = dynamic(() => import("../components/Gift"));
+const Home: React.FC = () => {
+  const [showGift, setShowGift] = useState(false);
 
-export default function Home() {
+  const handleMaxDecibelReached = () => {
+    // Delay the appearance of the Gift component by 2 seconds (2000 milliseconds)
+    setTimeout(() => {
+      setShowGift(true);
+    }, 1000); 
+  };
+
+  const handleRetry = () => {
+    setShowGift(false);
+  };
+
   return (
     <>
-    <DynamicAudio />
-    {/* <Gift /> */}
-  </>
+      <div>
+      <DecibelButton
+        onMaxDecibelReached={handleMaxDecibelReached}
+        onRetry={handleRetry}
+        showGift={showGift}
+      />
+      {showGift && <Gift />}
+
+    </div>
+    <span>by: Fresh Market Since 2003</span>
+    </>
   );
-}
+};
+
+export default Home;
