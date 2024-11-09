@@ -30,7 +30,6 @@ const Home: React.FC = () => {
       {showGift && <Gift />}
 
     </div>
-    <span>by: Fresh Market Since 2003</span>
     </>
   );
 };

@@ -17,7 +17,7 @@ const DecibelButton: React.FC<DecibelButtonProps> = ({ onMaxDecibelReached, onRe
   const microphoneRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const dataArrayRef = useRef<Uint8Array | null>(null);
 
-  const maxDecibels = 70;
+  const maxDecibels = 60;
 
   const startListening = async () => {
     try {
@@ -149,8 +149,8 @@ const DecibelButton: React.FC<DecibelButtonProps> = ({ onMaxDecibelReached, onRe
           <Image
             src="/ice.png"
             alt="Background Image"
-            width={500}
-            height={550}
+            width={400}
+            height={450}
             priority
           />
         </motion.div>
@@ -173,8 +173,8 @@ const DecibelButton: React.FC<DecibelButtonProps> = ({ onMaxDecibelReached, onRe
           <Image
             src="/ice-base.png"
             alt="Icon"
-            width={500}
-            height={550}
+            width={400}
+            height={450}
             priority
           />
         </picture>
