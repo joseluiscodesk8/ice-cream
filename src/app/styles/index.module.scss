@@ -1,16 +1,27 @@
 .decibels {
   width: 100%;
+  position: relative;
+
+  & button {
+    width: 100%;
+    font-size: 2.5rem;
+    position: relative;
+    z-index: 1000;
+    text-align: center;
+    transform: translate(0, 40px);
+    background: transparent;
+    border: none;
+
+  }
 
   & section {
-    position: relative;
+    position: absolute;
     width: 100vw;
     height: 100vh;
-    border: 2px solid #ddd;
     border-radius: 10px;
     overflow: hidden;
 
     & div {
-
       .insideCurve {
         position: absolute;
         top: -20px; // Adjust as needed
@@ -25,14 +36,9 @@
     }
 
     & picture {
-        // display: flex;
-        // width: 100%;
-        // height: 100%;
-        // background-image: url('/ice-base.png');
-        // background-repeat: no-repeat;
-        // background-size: 500px 550px;
-        // transform: translate(0, 80px);
-
+      display: grid;
+      place-content: center;
+      width: 100vw;
         & img {
             transform: translate(0, 80px);
         }
@@ -42,8 +48,20 @@
 }
 
 .ice {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100vw;
+  height: 100vh;
   position: absolute;
-  width: 98%;
-  border-radius: 15px;
-  box-shadow: 0 5px 5px #969696;
+
+  & h2 {
+    font-size: 2.5rem;
+  }
+
+  & picture {
+    transform: translate(0, -40px);
+    height: 220px;
+    overflow: hidden;
+  }
 }
