@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { MdIcecream } from "react-icons/md"; // Icono de helado
+import { FaBullhorn } from "react-icons/fa";
+
 import styles from "../styles/index.module.scss";
 
 interface DecibelButtonProps {
@@ -17,7 +20,10 @@ const DecibelButton: React.FC<DecibelButtonProps> = ({ onMaxDecibelReached, onRe
   const microphoneRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const dataArrayRef = useRef<Uint8Array | null>(null);
 
-  const maxDecibels = 60;
+  const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
+  const [isSectionVisible, setIsSectionVisible] = useState(false);
+
+  const maxDecibels = selectedLevel ?? 100; // Use the selected level for maxDecibels
 
   const startListening = async () => {
     try {
@@ -49,7 +55,6 @@ const DecibelButton: React.FC<DecibelButtonProps> = ({ onMaxDecibelReached, onRe
     }
     setIsListening(false);
   };
-
 
   const animationFrameRef = useRef<number | null>(null);
 
@@ -86,12 +91,12 @@ const DecibelButton: React.FC<DecibelButtonProps> = ({ onMaxDecibelReached, onRe
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [isListening, onMaxDecibelReached]);
+  }, [isListening, onMaxDecibelReached, maxDecibels]);
 
   const handleButtonClick = () => {
     if (showGift) {
       onRetry(); // Reset the gift and decibel level
-    } else {
+    } else if (selectedLevel !== null) {
       isListening ? stopListening() : startListening();
     }
   };
@@ -106,6 +111,15 @@ const DecibelButton: React.FC<DecibelButtonProps> = ({ onMaxDecibelReached, onRe
     const b = Math.round(startColor.b + (endColor.b - startColor.b) * percentage);
 
     return `rgb(${r}, ${g}, ${b})`;
+  };
+
+  const handleLevelChange = (level: number) => {
+    setSelectedLevel(level);
+    setIsSectionVisible(false); // Hide the section after selecting a checkpoint
+  };
+
+  const toggleSectionVisibility = () => {
+    setIsSectionVisible((prev) => !prev);
   };
 
   return (
@@ -179,6 +193,45 @@ const DecibelButton: React.FC<DecibelButtonProps> = ({ onMaxDecibelReached, onRe
           />
         </picture>
       </section>
+
+      {/* Section with checkpoints */}
+      <aside className={styles.checkpointsSection}>
+        <button onClick={toggleSectionVisibility}>
+          {/* Botón con icono actualizado para los checkpoints */}
+          {isSectionVisible ? <MdIcecream /> : <FaBullhorn /> }
+        </button>
+
+        {/* Show checkpoints only when section is visible */}
+        <div className={isSectionVisible ? styles.checkHidden : styles.checkContainer}>
+          <div>
+            <input
+              type="checkbox"
+              id="level1"
+              onChange={() => handleLevelChange(50)}
+              checked={selectedLevel === 50}
+            />
+            <label htmlFor="level1">Bajo</label>
+          </div>
+          <div>
+            <input
+              type="checkbox"
+              id="level2"
+              onChange={() => handleLevelChange(75)}
+              checked={selectedLevel === 75}
+            />
+            <label htmlFor="level2">Medio</label>
+          </div>
+          <div>
+            <input
+              type="checkbox"
+              id="level3"
+              onChange={() => handleLevelChange(100)}
+              checked={selectedLevel === 100}
+            />
+            <label htmlFor="level3">Alto</label>
+          </div>
+        </div>
+      </aside>
     </div>
   );
 };

@@ -3,7 +3,7 @@
   display: flex;
 
   & button {
-    width: 100%;
+    margin: auto;
     font-size: 2rem;
     text-shadow: 0 0 2px #000, 0 0 2px #000, 0 0 2px #000;
     color: #fff;
@@ -48,6 +48,54 @@
         }
     }
     
+  }
+
+  & .checkpointsSection {
+    position: absolute;
+    width: 100%;
+    top: 100px;
+    font-family: 'Cocogoose';
+ 
+
+    & button {
+      width: 35px;
+      top: -100px;
+      left: 20px;
+      position: absolute;
+      color: #000;
+    }
+
+    & .checkContainer {
+      position: absolute;
+      display: flex;
+      width: 100%;
+      padding: 4%;
+      left: -100%;
+      justify-content: space-between;
+      transition: .5s ease-in-out;
+
+      & div {
+        display: flex;
+        justify-content: space-evenly;
+        width: 85px;
+      }
+    }
+
+    & .checkHidden {
+      position: absolute;
+      display: flex;
+      width: 100%;
+      padding: 4%;
+      left: 0;
+      justify-content: space-between;
+      transition: .5s ease-in-out;
+
+      & div {
+        display: flex;
+        justify-content: space-evenly;
+        width: 85px;
+      }
+    }
   }
 }
 
