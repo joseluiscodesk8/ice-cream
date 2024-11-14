@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { MdIcecream } from "react-icons/md"; // Icono de helado
 import { FaBullhorn } from "react-icons/fa";
+import { MdIcecream } from "react-icons/md";
 
 import styles from "../styles/index.module.scss";
 
@@ -12,18 +12,22 @@ interface DecibelButtonProps {
   showGift: boolean;
 }
 
-const DecibelButton: React.FC<DecibelButtonProps> = ({ onMaxDecibelReached, onRetry, showGift }) => {
+const DecibelButton: React.FC<DecibelButtonProps> = ({
+  onMaxDecibelReached,
+  onRetry,
+  showGift,
+}) => {
   const [decibels, setDecibels] = useState<number>(0);
   const [isListening, setIsListening] = useState(false);
+  const [maxDecibels, setMaxDecibels] = useState<number>(100);
+  const [tempMaxDecibels, setTempMaxDecibels] = useState<number>(maxDecibels);
+  const [isInputVisible, setIsInputVisible] = useState(false);
+
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const microphoneRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const dataArrayRef = useRef<Uint8Array | null>(null);
-
-  const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
-  const [isSectionVisible, setIsSectionVisible] = useState(false);
-
-  const maxDecibels = selectedLevel ?? 100; // Use the selected level for maxDecibels
+  const animationFrameRef = useRef<number | null>(null);
 
   const startListening = async () => {
     try {
@@ -31,8 +35,11 @@ const DecibelButton: React.FC<DecibelButtonProps> = ({ onMaxDecibelReached, onRe
       audioContextRef.current = new AudioContext();
       analyserRef.current = audioContextRef.current.createAnalyser();
       analyserRef.current.fftSize = 256;
-      dataArrayRef.current = new Uint8Array(analyserRef.current.frequencyBinCount);
-      microphoneRef.current = audioContextRef.current.createMediaStreamSource(stream);
+      dataArrayRef.current = new Uint8Array(
+        analyserRef.current.frequencyBinCount
+      );
+      microphoneRef.current =
+        audioContextRef.current.createMediaStreamSource(stream);
       microphoneRef.current.connect(analyserRef.current);
       setIsListening(true);
     } catch (error) {
@@ -41,22 +48,12 @@ const DecibelButton: React.FC<DecibelButtonProps> = ({ onMaxDecibelReached, onRe
   };
 
   const stopListening = () => {
-    if (microphoneRef.current) {
-      microphoneRef.current.disconnect();
-      microphoneRef.current = null;
-    }
-    if (analyserRef.current) {
-      analyserRef.current.disconnect();
-      analyserRef.current = null;
-    }
-    if (audioContextRef.current && audioContextRef.current.state !== "closed") {
+    if (microphoneRef.current) microphoneRef.current.disconnect();
+    if (analyserRef.current) analyserRef.current.disconnect();
+    if (audioContextRef.current && audioContextRef.current.state !== "closed")
       audioContextRef.current.close();
-      audioContextRef.current = null;
-    }
     setIsListening(false);
   };
-
-  const animationFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (isListening) {
@@ -65,61 +62,60 @@ const DecibelButton: React.FC<DecibelButtonProps> = ({ onMaxDecibelReached, onRe
           analyserRef.current.getByteFrequencyData(dataArrayRef.current);
           const sum = dataArrayRef.current.reduce((a, b) => a + b, 0);
           const average = sum / dataArrayRef.current.length;
-          const decibels = Math.min(Math.round(average), maxDecibels);
-          setDecibels(decibels);
+          const currentDecibels = Math.min(Math.round(average), maxDecibels);
+          setDecibels(currentDecibels);
 
-          if (decibels >= maxDecibels) {
+          if (currentDecibels >= maxDecibels) {
             stopListening();
             onMaxDecibelReached();
           }
         }
-
-        if (isListening) {
+        if (isListening)
           animationFrameRef.current = requestAnimationFrame(captureDecibels);
-        }
       };
       animationFrameRef.current = requestAnimationFrame(captureDecibels);
-    } else {
-      if (animationFrameRef.current !== null) {
-        cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = null;
-      }
+    } else if (animationFrameRef.current !== null) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
     }
 
     return () => {
-      if (animationFrameRef.current !== null) {
+      if (animationFrameRef.current !== null)
         cancelAnimationFrame(animationFrameRef.current);
-      }
     };
   }, [isListening, onMaxDecibelReached, maxDecibels]);
 
   const handleButtonClick = () => {
-    if (showGift) {
-      onRetry(); // Reset the gift and decibel level
-    } else if (selectedLevel !== null) {
-      isListening ? stopListening() : startListening();
-    }
+    showGift ? onRetry() : isListening ? stopListening() : startListening();
+  };
+
+  const toggleInputVisibility = () => {
+    setIsInputVisible((prev) => !prev);
+  };
+
+  const handleMaxDecibelsChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setTempMaxDecibels(Number(event.target.value));
+    setTimeout(() => {
+      setMaxDecibels(Number(event.target.value));
+    }, 3000);
   };
 
   const getBackgroundColor = (decibels: number) => {
     const startColor = { r: 2, g: 130, b: 84 };
     const endColor = { r: 100, g: 200, b: 44 };
     const percentage = decibels / maxDecibels;
-
-    const r = Math.round(startColor.r + (endColor.r - startColor.r) * percentage);
-    const g = Math.round(startColor.g + (endColor.g - startColor.g) * percentage);
-    const b = Math.round(startColor.b + (endColor.b - startColor.b) * percentage);
-
+    const r = Math.round(
+      startColor.r + (endColor.r - startColor.r) * percentage
+    );
+    const g = Math.round(
+      startColor.g + (endColor.g - startColor.g) * percentage
+    );
+    const b = Math.round(
+      startColor.b + (endColor.b - startColor.b) * percentage
+    );
     return `rgb(${r}, ${g}, ${b})`;
-  };
-
-  const handleLevelChange = (level: number) => {
-    setSelectedLevel(level);
-    setIsSectionVisible(false); // Hide the section after selecting a checkpoint
-  };
-
-  const toggleSectionVisibility = () => {
-    setIsSectionVisible((prev) => !prev);
   };
 
   return (
@@ -144,7 +140,6 @@ const DecibelButton: React.FC<DecibelButtonProps> = ({ onMaxDecibelReached, onRe
         >
           <div className={styles.insideCurve}></div>
         </motion.div>
-
         <motion.div
           initial={{ y: "19px" }}
           animate={{ opacity: 1, y: "19px" }}
@@ -168,7 +163,6 @@ const DecibelButton: React.FC<DecibelButtonProps> = ({ onMaxDecibelReached, onRe
             priority
           />
         </motion.div>
-
         <motion.div
           initial={{ bottom: "0%" }}
           animate={{ bottom: `${(decibels / maxDecibels) * 100}%` }}
@@ -182,7 +176,6 @@ const DecibelButton: React.FC<DecibelButtonProps> = ({ onMaxDecibelReached, onRe
             backgroundColor: "rgba(255, 255, 255, 1)",
           }}
         ></motion.div>
-
         <picture>
           <Image
             src="/ice-base.png"
@@ -194,43 +187,19 @@ const DecibelButton: React.FC<DecibelButtonProps> = ({ onMaxDecibelReached, onRe
         </picture>
       </section>
 
-      {/* Section with checkpoints */}
       <aside className={styles.checkpointsSection}>
-        <button onClick={toggleSectionVisibility}>
-          {/* Botón con icono actualizado para los checkpoints */}
-          {isSectionVisible ? <MdIcecream /> : <FaBullhorn /> }
+        <button onClick={toggleInputVisibility}>
+          {isInputVisible ? <MdIcecream /> : <FaBullhorn />}
         </button>
-
-        {/* Show checkpoints only when section is visible */}
-        <div className={isSectionVisible ? styles.checkHidden : styles.checkContainer}>
-          <div>
-            <input
-              type="checkbox"
-              id="level1"
-              onChange={() => handleLevelChange(50)}
-              checked={selectedLevel === 50}
-            />
-            <label htmlFor="level1">Bajo</label>
-          </div>
-          <div>
-            <input
-              type="checkbox"
-              id="level2"
-              onChange={() => handleLevelChange(75)}
-              checked={selectedLevel === 75}
-            />
-            <label htmlFor="level2">Medio</label>
-          </div>
-          <div>
-            <input
-              type="checkbox"
-              id="level3"
-              onChange={() => handleLevelChange(100)}
-              checked={selectedLevel === 100}
-            />
-            <label htmlFor="level3">Alto</label>
-          </div>
-        </div>
+        <input
+          type="number"
+          value={tempMaxDecibels}
+          onChange={handleMaxDecibelsChange}
+          placeholder="Ingresar numero"
+          className={
+            isInputVisible ? styles.decibelInput : styles.decibelInputHidden
+          }
+        />
       </aside>
     </div>
   );

@@ -65,39 +65,31 @@
       color: #000;
     }
 
-    & .checkContainer {
+    & .decibelInput {
+      width: 50px;
+      height: 25px;
       position: absolute;
-      display: flex;
-      width: 100%;
-      padding: 4%;
-      left: -100%;
-      justify-content: space-between;
+      top: -25px;
+      left: 15px;
       transition: .5s ease-in-out;
-
-      & div {
-        display: flex;
-        justify-content: space-evenly;
-        width: 85px;
-      }
+      opacity: 1;
+    
     }
 
-    & .checkHidden {
+    & .decibelInputHidden {
+      width: 50px;
+      height: 0;
       position: absolute;
-      display: flex;
-      width: 100%;
-      padding: 4%;
-      left: 0;
-      justify-content: space-between;
+      top: -25px;
+      left: 15px;
       transition: .5s ease-in-out;
-
-      & div {
-        display: flex;
-        justify-content: space-evenly;
-        width: 85px;
-      }
+      opacity: 0;
     }
+
+    }
+
   }
-}
+
 
 .ice {
   display: flex;
